@@ -84,7 +84,7 @@ func main() {
 			} else {
 				timeout.Stop()
 			}
-			logging.VeryVerbose.Printf("new masters detected: %v", masters)
+			log.Printf("new masters detected: %v", masters)
 			res.SetMasters(masters)
 			res.Reload()
 		case err := <-errch:
