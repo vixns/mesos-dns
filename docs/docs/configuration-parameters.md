@@ -37,7 +37,8 @@ The configuration file should include the following fields:
   "SOARetry":   600,
   "SOAExpire":  86400,
   "SOAMinttl": 60,
-  "IPSources": ["netinfo", "mesos", "host"]
+  "IPSources": ["netinfo", "mesos", "host"],
+  "UseContainerPorts": false
 }
 ```
 
@@ -114,3 +115,6 @@ sorted by priority. If you use **Docker**, and enable the `netinfo` IPSource, it
 - `mesos`: Mesos containerizer IP. **DEPRECATED**
 - `docker`: Docker containerizer IP. **DEPRECATED**
 - `netinfo`: Mesos 0.25 NetworkInfo.
+
+`UseContainerPorts` is a boolean field that controls whether Mesos-DNS use the container ports from the containerinfos port mapping definitions. It return the container port only if a match is found, the host port otherwise. This behavioir requires the `netinfo` IPSource.
+

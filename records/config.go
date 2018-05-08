@@ -108,6 +108,9 @@ type Config struct {
 	httpConfigMap httpcli.ConfigMap
 
 	MesosAuthentication httpcli.AuthMechanism
+
+	// Use container ports from portmapping definitions.
+	UseContainerPorts bool
 }
 
 // NewConfig return the default config of the resolver
@@ -140,6 +143,7 @@ func NewConfig() Config {
 		IPSources:              []string{"netinfo", "mesos", "host"},
 		EnumerationOn:          true,
 		MesosAuthentication:    httpcli.AuthNone,
+		UseContainerPorts:      false,
 	}
 }
 
@@ -309,6 +313,7 @@ func (c Config) log() {
 				"MesosAuthentication is set to none. This is probably not intentional")
 		}
 	}
+	logging.Verbose.Println("   - UseContainerPorts: ", c.UseContainerPorts)
 }
 
 func readCACertFile(caCertFile string) (caPool *x509.CertPool, err error) {
