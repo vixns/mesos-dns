@@ -210,7 +210,6 @@ func statusIPs(st []Status, src func(*Status) []string) []string {
 
 // MapPort returns the mapped port if available, or the host port
 // listening on.
-// TODO: error checking, is Statuses[0] always the current status ?
 func MapPort(t Task, hostport int) int {
 	ni := t.Statuses[0].ContainerStatus.NetworkInfos
 	for n := range ni {
