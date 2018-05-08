@@ -214,11 +214,9 @@ func statusIPs(st []Status, src func(*Status) []string) []string {
 func MapPort(t Task, hostport int) (int, string) {
 	ni := t.Statuses[0].ContainerStatus.NetworkInfos
 	for n := range ni {
-		if ni[n].PortMappings != nil {
-			for m := range ni[n].PortMappings {
-				if ni[n].PortMappings[m].HostPort == hostport {
-					return ni[n].PortMappings[m].ContainerPort, ""
-				}
+		for m := range ni[n].PortMappings {
+			if ni[n].PortMappings[m].HostPort == hostport {
+				return ni[n].PortMappings[m].ContainerPort, ""
 			}
 		}
 	}
