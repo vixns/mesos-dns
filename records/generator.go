@@ -488,7 +488,8 @@ func (rg *RecordGenerator) taskContextRecord(ctx context, task state.Task, f sta
 	}
 
 	for _, port := range task.DiscoveryInfo.Ports.DiscoveryPorts {
-		target := canonical + tail + ":" + strconv.Itoa(port.Number)
+		p, _ := state.MapPort(task, port.Number)
+		target := canonical + tail + ":" + strconv.Itoa(p)
 		recordName(withProtocol(port.Protocol, fname, spec,
 			withNamedPort(port.Name, spec, asSRV(target))))
 	}

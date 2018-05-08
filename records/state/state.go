@@ -71,7 +71,8 @@ type ContainerStatus struct {
 // NetworkInfo holds the network configuration for a single interface
 // as defined in the /state Mesos HTTP endpoint.
 type NetworkInfo struct {
-	IPAddresses []IPAddress `json:"ip_addresses,omitempty"`
+	IPAddresses  []IPAddress   `json:"ip_addresses,omitempty"`
+	PortMappings []PortMapping `json:"port_mappings,omitempty"`
 	// back-compat with 0.25 IPAddress format
 	IPAddress string `json:"ip_address,omitempty"`
 }
@@ -82,7 +83,14 @@ type IPAddress struct {
 	IPAddress string `json:"ip_address,omitempty"`
 }
 
-// Task holds a task as defined in the /state Mesos HTTP endpoint.
+// PortMapping holds a port for a task defined in the /state Mesos HTTP endpoint.
+type PortMapping struct {
+	Protocol      string `json:"protocol,omitempty"`
+	HostPort      int    `json:"host_port"`
+	ContainerPort int    `json:"container_port"`
+}
+
+// Task holds a task as defined in the /state.json Mesos HTTP endpoint.
 type Task struct {
 	FrameworkID   string   `json:"framework_id"`
 	ID            string   `json:"id"`
@@ -198,6 +206,23 @@ func statusIPs(st []Status, src func(*Status) []string) []string {
 		return src(&st[j])
 	}
 	return nil
+}
+
+// MapPort returns the mapped port if available, or the host port
+// listening on.
+// TODO: error checking, is Statuses[0] always the current status ?
+func MapPort(t Task, hostport int) (int, string) {
+	ni := t.Statuses[0].ContainerStatus.NetworkInfos
+	for n := range ni {
+		if ni[n].PortMappings != nil {
+			for m := range ni[n].PortMappings {
+				if ni[n].PortMappings[m].HostPort == hostport {
+					return ni[n].PortMappings[m].ContainerPort, ""
+				}
+			}
+		}
+	}
+	return hostport, ""
 }
 
 // labels returns all given Status.[]Labels' values whose keys are equal
