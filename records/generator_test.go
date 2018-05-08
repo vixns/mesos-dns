@@ -226,7 +226,7 @@ func expectRecords(rg *RecordGenerator, expect []expectedRR) (eA, eAAAA, eSRV rr
 	return
 }
 
-func testRecordGenerator(t *testing.T, spec labels.Func, ipSources []string) RecordGenerator {
+func testRecordGenerator(t *testing.T, spec labels.Func, ipSources []string, UseContainerPorts bool) RecordGenerator {
 	var sj state.State
 
 	b, err := ioutil.ReadFile("../factories/fake.json")
@@ -240,7 +240,7 @@ func testRecordGenerator(t *testing.T, spec labels.Func, ipSources []string) Rec
 	masters := []string{"144.76.157.37:5050"}
 
 	var rg RecordGenerator
-	if err := rg.InsertState(sj, "mesos", "mesos-dns.mesos.", "127.0.0.1", masters, ipSources, spec); err != nil {
+	if err := rg.InsertState(sj, "mesos", "mesos-dns.mesos.", "127.0.0.1", masters, ipSources, UseContainerPorts, spec); err != nil {
 		t.Fatal(err)
 	}
 
@@ -249,11 +249,12 @@ func testRecordGenerator(t *testing.T, spec labels.Func, ipSources []string) Rec
 
 // ensure we are parsing what we think we are
 func TestInsertState(t *testing.T) {
-	rg := testRecordGenerator(t, labels.RFC952, []string{"netinfo", "docker", "mesos", "host"})
-	rgDocker := testRecordGenerator(t, labels.RFC952, []string{"docker", "host"})
-	rgMesos := testRecordGenerator(t, labels.RFC952, []string{"mesos", "host"})
-	rgSlave := testRecordGenerator(t, labels.RFC952, []string{"host"})
-	rgNetinfo := testRecordGenerator(t, labels.RFC952, []string{"netinfo"})
+	rg := testRecordGenerator(t, labels.RFC952, []string{"netinfo", "docker", "mesos", "host"}, false)
+	rgDocker := testRecordGenerator(t, labels.RFC952, []string{"docker", "host"}, false)
+	rgMesos := testRecordGenerator(t, labels.RFC952, []string{"mesos", "host"}, false)
+	rgSlave := testRecordGenerator(t, labels.RFC952, []string{"host"}, false)
+	rgNetinfo := testRecordGenerator(t, labels.RFC952, []string{"netinfo"}, false)
+	rgContainerPorts := testRecordGenerator(t, labels.RFC952, []string{"netinfo"}, true)
 
 	for i, tt := range []struct {
 		rrs  rrs
@@ -332,6 +333,11 @@ func TestInsertState(t *testing.T) {
 
 		{rgNetinfo.AAAAs, "toy-store.ipv6-framework.mesos.", []string{"fd01:b::1:8000:2"}},
 		{rgNetinfo.AAAAs, "toy-store.ipv6-framework.slave.mesos.", []string{"2001:db8::1"}},
+
+		{rgContainerPorts.As, "toy-store.ipv6-framework.mesos.", []string{"12.0.1.2"}},
+
+		{rgContainerPorts.AAAAs, "toy-store.ipv6-framework.mesos.", []string{"fd01:b::1:8000:2"}},
+		{rgContainerPorts.AAAAs, "toy-store.ipv6-framework.slave.mesos.", []string{"2001:db8::1"}},
 
 		{rgDocker.As, "liquor-store.marathon.mesos.", []string{"10.3.0.1", "10.3.0.2"}},
 		{rgDocker.As, "liquor-store.marathon.slave.mesos.", []string{"1.2.3.11", "1.2.3.12"}},
