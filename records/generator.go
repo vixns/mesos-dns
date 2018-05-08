@@ -188,7 +188,7 @@ func (rg *RecordGenerator) ParseState(c Config, masters ...string) error {
 		hostSpec = labels.RFC952
 	}
 
-	return rg.InsertState(sj, c.Domain, c.SOAMname, c.Listener, masters, c.IPSources, c.UseContainerPorts, hostSpec)
+	return rg.InsertState(sj, c.Domain, c.SOAMname, c.Listener, masters, c.IPSources, c.SRVPreferContainerPorts, hostSpec)
 }
 
 // hashes a given name using a truncated sha1 hash
@@ -202,7 +202,7 @@ func hashString(s string) string {
 }
 
 // InsertState transforms a StateJSON into RecordGenerator RRs
-func (rg *RecordGenerator) InsertState(sj state.State, domain, ns, listener string, masters, ipSources []string, UseContainerPorts bool, spec labels.Func) error {
+func (rg *RecordGenerator) InsertState(sj state.State, domain, ns, listener string, masters, ipSources []string, SRVPreferContainerPorts bool, spec labels.Func) error {
 	rg.SlaveIPs = map[string][]string{}
 	rg.SRVs = rrs{}
 	rg.As = rrs{}
@@ -211,7 +211,7 @@ func (rg *RecordGenerator) InsertState(sj state.State, domain, ns, listener stri
 	rg.slaveRecords(sj, domain, spec)
 	rg.listenerRecord(listener, ns)
 	rg.masterRecord(domain, masters, sj.Leader)
-	rg.taskRecords(sj, domain, spec, ipSources, UseContainerPorts)
+	rg.taskRecords(sj, domain, spec, ipSources, SRVPreferContainerPorts)
 
 	return nil
 }
@@ -368,7 +368,7 @@ func (rg *RecordGenerator) listenerRecord(listener string, ns string) {
 	}
 }
 
-func (rg *RecordGenerator) taskRecords(sj state.State, domain string, spec labels.Func, ipSources []string, UseContainerPorts bool) {
+func (rg *RecordGenerator) taskRecords(sj state.State, domain string, spec labels.Func, ipSources []string, SRVPreferContainerPorts bool) {
 	for _, f := range sj.Frameworks {
 		enumerableFramework := &EnumerableFramework{
 			Name:  f.Name,
@@ -382,22 +382,22 @@ func (rg *RecordGenerator) taskRecords(sj state.State, domain string, spec label
 
 			// only do running and discoverable tasks
 			if ok && (task.State == "TASK_RUNNING") {
-				rg.taskRecord(task, f, domain, spec, ipSources, UseContainerPorts, enumerableFramework)
+				rg.taskRecord(task, f, domain, spec, ipSources, SRVPreferContainerPorts, enumerableFramework)
 			}
 		}
 	}
 }
 
 type context struct {
-	taskName          string
-	taskID            string
-	slaveID           string
-	taskIPs           []net.IP
-	slaveIPs          []string
-	UseContainerPorts bool
+	taskName                string
+	taskID                  string
+	slaveID                 string
+	taskIPs                 []net.IP
+	slaveIPs                []string
+	SRVPreferContainerPorts bool
 }
 
-func (rg *RecordGenerator) taskRecord(task state.Task, f state.Framework, domain string, spec labels.Func, ipSources []string, UseContainerPorts bool, enumFW *EnumerableFramework) {
+func (rg *RecordGenerator) taskRecord(task state.Task, f state.Framework, domain string, spec labels.Func, ipSources []string, SRVPreferContainerPorts bool, enumFW *EnumerableFramework) {
 
 	newTask := &EnumerableTask{ID: task.ID, Name: task.Name}
 
@@ -410,7 +410,7 @@ func (rg *RecordGenerator) taskRecord(task state.Task, f state.Framework, domain
 		slaveIDTail(task.SlaveID),
 		task.IPs(ipSources...),
 		task.SlaveIPs,
-		UseContainerPorts,
+		SRVPreferContainerPorts,
 	}
 
 	// use DiscoveryInfo name if defined instead of task name
@@ -491,7 +491,7 @@ func (rg *RecordGenerator) taskContextRecord(ctx context, task state.Task, f sta
 
 	for _, port := range task.DiscoveryInfo.Ports.DiscoveryPorts {
 		p := port.Number
-		if ctx.UseContainerPorts {
+		if ctx.SRVPreferContainerPorts {
 			p = state.MapPort(task, port.Number)
 		}
 		target := canonical + tail + ":" + strconv.Itoa(p)

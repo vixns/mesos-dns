@@ -25,5 +25,5 @@
   "IPSources": ["mesos", "host"],
   "EnforceRFC952": false,
   "EnumerationOn": true,
-  "UseContainerPorts": false
+  "SRVPreferContainerPorts": false
 }

@@ -110,40 +110,40 @@ type Config struct {
 	MesosAuthentication httpcli.AuthMechanism
 
 	// Use container ports from portmapping definitions.
-	UseContainerPorts bool
+	SRVPreferContainerPorts bool
 }
 
 // NewConfig return the default config of the resolver
 func NewConfig() Config {
 	return Config{
-		SRVRecordDefaultWeight: 1,
-		ZkDetectionTimeout:     30,
-		RefreshSeconds:         60,
-		TTL:                    60,
-		Domain:                 "mesos",
-		Port:                   53,
-		Timeout:                5,
-		StateTimeoutSeconds:    300,
-		SOARname:               "root.ns1.mesos",
-		SOAMname:               "ns1.mesos",
-		SOARefresh:             60,
-		SOARetry:               600,
-		SOAExpire:              86400,
-		SOAMinttl:              60,
-		ZoneResolvers:          map[string][]string{},
-		Resolvers:              []string{"8.8.8.8"},
-		Listener:               "0.0.0.0",
-		HTTPListener:           "0.0.0.0",
-		HTTPPort:               8123,
-		DNSOn:                  true,
-		HTTPOn:                 true,
-		ExternalOn:             true,
-		SetTruncateBit:         true,
-		RecurseOn:              true,
-		IPSources:              []string{"netinfo", "mesos", "host"},
-		EnumerationOn:          true,
-		MesosAuthentication:    httpcli.AuthNone,
-		UseContainerPorts:      false,
+		SRVRecordDefaultWeight:  1,
+		ZkDetectionTimeout:      30,
+		RefreshSeconds:          60,
+		TTL:                     60,
+		Domain:                  "mesos",
+		Port:                    53,
+		Timeout:                 5,
+		StateTimeoutSeconds:     300,
+		SOARname:                "root.ns1.mesos",
+		SOAMname:                "ns1.mesos",
+		SOARefresh:              60,
+		SOARetry:                600,
+		SOAExpire:               86400,
+		SOAMinttl:               60,
+		ZoneResolvers:           map[string][]string{},
+		Resolvers:               []string{"8.8.8.8"},
+		Listener:                "0.0.0.0",
+		HTTPListener:            "0.0.0.0",
+		HTTPPort:                8123,
+		DNSOn:                   true,
+		HTTPOn:                  true,
+		ExternalOn:              true,
+		SetTruncateBit:          true,
+		RecurseOn:               true,
+		IPSources:               []string{"netinfo", "mesos", "host"},
+		EnumerationOn:           true,
+		MesosAuthentication:     httpcli.AuthNone,
+		SRVPreferContainerPorts: false,
 	}
 }
 
@@ -313,7 +313,7 @@ func (c Config) log() {
 				"MesosAuthentication is set to none. This is probably not intentional")
 		}
 	}
-	logging.Verbose.Println("   - UseContainerPorts: ", c.UseContainerPorts)
+	logging.Verbose.Println("   - SRVPreferContainerPorts: ", c.SRVPreferContainerPorts)
 }
 
 func readCACertFile(caCertFile string) (caPool *x509.CertPool, err error) {

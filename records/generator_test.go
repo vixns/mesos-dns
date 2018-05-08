@@ -226,7 +226,7 @@ func expectRecords(rg *RecordGenerator, expect []expectedRR) (eA, eAAAA, eSRV rr
 	return
 }
 
-func testRecordGenerator(t *testing.T, spec labels.Func, ipSources []string, UseContainerPorts bool) RecordGenerator {
+func testRecordGenerator(t *testing.T, spec labels.Func, ipSources []string, SRVPreferContainerPorts bool) RecordGenerator {
 	var sj state.State
 
 	b, err := ioutil.ReadFile("../factories/fake.json")
@@ -240,7 +240,7 @@ func testRecordGenerator(t *testing.T, spec labels.Func, ipSources []string, Use
 	masters := []string{"144.76.157.37:5050"}
 
 	var rg RecordGenerator
-	if err := rg.InsertState(sj, "mesos", "mesos-dns.mesos.", "127.0.0.1", masters, ipSources, UseContainerPorts, spec); err != nil {
+	if err := rg.InsertState(sj, "mesos", "mesos-dns.mesos.", "127.0.0.1", masters, ipSources, SRVPreferContainerPorts, spec); err != nil {
 		t.Fatal(err)
 	}
 

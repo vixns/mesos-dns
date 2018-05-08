@@ -46,14 +46,14 @@ func BenchmarkTaskRecord_withoutDiscoveryInfo(b *testing.B) {
 		taskCount   = 1000
 	)
 	type params struct {
-		task              state.Task
-		f                 state.Framework
-		domain            string
-		spec              labels.Func
-		ipSources         []string
-		enumFW            EnumerableFramework
-		rg                RecordGenerator
-		UseContainerPorts bool
+		task                    state.Task
+		f                       state.Framework
+		domain                  string
+		spec                    labels.Func
+		ipSources               []string
+		enumFW                  EnumerableFramework
+		rg                      RecordGenerator
+		SRVPreferContainerPorts bool
 	}
 	var (
 		initialState = params{
@@ -68,7 +68,7 @@ func BenchmarkTaskRecord_withoutDiscoveryInfo(b *testing.B) {
 				As:   rrs{},
 				SRVs: rrs{},
 			},
-			UseContainerPorts: false,
+			SRVPreferContainerPorts: false,
 		}
 		slaves = make([]string, clusterSize)
 		tasks  = make([]string, taskCount)
@@ -89,6 +89,6 @@ func BenchmarkTaskRecord_withoutDiscoveryInfo(b *testing.B) {
 		tt.task.Name = tasks[ti]
 		tt.task.SlaveIPs = []string{slaves[si]}
 		tt.task.SlaveID = "ID-" + slaves[si]
-		tt.rg.taskRecord(tt.task, tt.f, tt.domain, tt.spec, tt.ipSources, tt.UseContainerPorts, &tt.enumFW)
+		tt.rg.taskRecord(tt.task, tt.f, tt.domain, tt.spec, tt.ipSources, tt.SRVPreferContainerPorts, &tt.enumFW)
 	}
 }
