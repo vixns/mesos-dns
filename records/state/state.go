@@ -90,7 +90,7 @@ type PortMapping struct {
 	ContainerPort int    `json:"container_port"`
 }
 
-// Task holds a task as defined in the /state.json Mesos HTTP endpoint.
+// Task holds a task as defined in the /state Mesos HTTP endpoint.
 type Task struct {
 	FrameworkID   string   `json:"framework_id"`
 	ID            string   `json:"id"`
