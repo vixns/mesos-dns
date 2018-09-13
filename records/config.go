@@ -116,10 +116,10 @@ type Config struct {
 // NewConfig return the default config of the resolver
 func NewConfig() Config {
 	return Config{
-		SRVRecordDefaultWeight:  1,
 		ZkDetectionTimeout:      30,
 		RefreshSeconds:          60,
 		TTL:                     60,
+		SRVRecordDefaultWeight:  1,
 		Domain:                  "mesos",
 		Port:                    53,
 		Timeout:                 5,
