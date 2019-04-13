@@ -53,7 +53,7 @@ func BenchmarkTaskRecord_withoutDiscoveryInfo(b *testing.B) {
 		ipSources               []string
 		enumFW                  EnumerableFramework
 		rg                      RecordGenerator
-		SRVPreferContainerPorts bool
+		srvPreferContainerPorts bool
 	}
 	var (
 		initialState = params{
@@ -68,7 +68,7 @@ func BenchmarkTaskRecord_withoutDiscoveryInfo(b *testing.B) {
 				As:   rrs{},
 				SRVs: rrs{},
 			},
-			SRVPreferContainerPorts: false,
+			srvPreferContainerPorts: false,
 		}
 		slaves = make([]string, clusterSize)
 		tasks  = make([]string, taskCount)
@@ -89,6 +89,6 @@ func BenchmarkTaskRecord_withoutDiscoveryInfo(b *testing.B) {
 		tt.task.Name = tasks[ti]
 		tt.task.SlaveIPs = []string{slaves[si]}
 		tt.task.SlaveID = "ID-" + slaves[si]
-		tt.rg.taskRecord(tt.task, tt.f, tt.domain, tt.spec, tt.ipSources, tt.SRVPreferContainerPorts, &tt.enumFW)
+		tt.rg.taskRecord(tt.task, tt.f, tt.domain, tt.spec, tt.ipSources, tt.srvPreferContainerPorts, &tt.enumFW)
 	}
 }

@@ -412,7 +412,7 @@ func fakeDNS() (*Resolver, error) {
 	}
 
 	spec := labels.RFC952
-	err = res.rs.InsertState(sj, "mesos", "mesos-dns.mesos.", "127.0.0.1", res.config.Masters, res.config.IPSources, spec)
+	err = res.rs.InsertState(sj, "mesos", "mesos-dns.mesos.", "127.0.0.1", res.config.Masters, res.config.IPSources, res.config.SRVPreferContainerPorts, spec)
 	if err != nil {
 		return nil, err
 	}
